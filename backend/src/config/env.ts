@@ -1,3 +1,4 @@
+
 const validateEnv = (): void => {
   const errors: string[] = [];
 
@@ -8,11 +9,8 @@ const validateEnv = (): void => {
   const requiredVariables = [
     "MONGODB_URI",
     "JWT_SECRET",
-    "EMAIL_USER",
-    "EMAIL_APP_PASSWORD",
-    "CLOUDINARY_CLOUD_NAME",
-    "CLOUDINARY_API_KEY",
-    "CLOUDINARY_API_SECRET",
+    "BREVO_API_KEY",
+    "EMAIL_FROM",
   ] as const;
 
   for (const variable of requiredVariables) {
@@ -22,7 +20,7 @@ const validateEnv = (): void => {
   }
 
   // ==========================================
-  // JWT SECRET AND EXPIRATION VALIDATION
+  // JWT SECRET VALIDATION
   // ==========================================
 
   const jwtSecret = process.env.JWT_SECRET?.trim();
@@ -37,24 +35,29 @@ const validateEnv = (): void => {
     );
   }
 
-  // Keep JWT expiry and authentication-cookie expiry synchronized.
-  // Supported examples: 15m, 1h, 1d, 7d.
-  const jwtExpiresIn = process.env.JWT_EXPIRES_IN?.trim();
+  // ==========================================
+  // BREVO EMAIL CONFIGURATION
+  // ==========================================
 
-  if (jwtExpiresIn) {
-    const isNumericMilliseconds = /^\d+$/.test(jwtExpiresIn);
-    const durationMatch = /^(\d+(?:\.\d+)?)\s*(ms|milliseconds?|s|seconds?|m|minutes?|h|hours?|d|days?|w|weeks?|y|years?)$/i.exec(jwtExpiresIn);
-    const durationAmount = Number(
-      isNumericMilliseconds ? jwtExpiresIn : durationMatch?.[1]
-    );
+  const brevoApiKey = process.env.BREVO_API_KEY?.trim();
 
-    if (
-      (!isNumericMilliseconds && !durationMatch) ||
-      !Number.isFinite(durationAmount) ||
-      durationAmount < 1
-    ) {
+  if (brevoApiKey && brevoApiKey.length < 20) {
+    errors.push("BREVO_API_KEY does not appear to be valid");
+  }
+
+  const emailFrom = process.env.EMAIL_FROM?.trim();
+
+  if (emailFrom) {
+    const displayNameMatch =
+      /^(.*?)\s*<\s*([^<>]+)\s*>$/.exec(emailFrom);
+
+    const senderEmail = (
+      displayNameMatch?.[2] ?? emailFrom
+    ).trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(senderEmail)) {
       errors.push(
-        "JWT_EXPIRES_IN must be a positive duration such as 15m, 1h, or 1d"
+        "EMAIL_FROM must be a valid email address or a name followed by <email@domain.com>"
       );
     }
   }
@@ -100,7 +103,9 @@ const validateEnv = (): void => {
       .filter(Boolean);
 
     if (frontendURLs.length === 0) {
-      errors.push("FRONTEND_URL must contain at least one valid URL");
+      errors.push(
+        "FRONTEND_URL must contain at least one valid URL"
+      );
     }
 
     for (const url of frontendURLs) {
@@ -142,53 +147,6 @@ const validateEnv = (): void => {
   }
 
   // ==========================================
-  // EMAIL CONFIGURATION VALIDATION
-  // ==========================================
-
-  const emailUser = process.env.EMAIL_USER?.trim();
-
-  if (emailUser && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailUser)) {
-    errors.push("EMAIL_USER must be a valid email address");
-  }
-
-  if (
-    process.env.EMAIL_APP_PASSWORD &&
-    !process.env.EMAIL_APP_PASSWORD.trim()
-  ) {
-    errors.push("EMAIL_APP_PASSWORD cannot be empty");
-  }
-
-  // EMAIL_FROM is optional; the email helper falls back to EMAIL_USER.
-  const emailFrom = process.env.EMAIL_FROM?.trim();
-
-  if (emailFrom) {
-    const bracketedEmail = /<([^<>]+)>$/.exec(emailFrom);
-    const address = bracketedEmail ? bracketedEmail[1].trim() : emailFrom;
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(address)) {
-      errors.push("EMAIL_FROM must contain a valid email address");
-    }
-  }
-
-  // ==========================================
-  // CLOUDINARY CONFIGURATION VALIDATION
-  // ==========================================
-
-  const cloudinaryValues = [
-    "CLOUDINARY_CLOUD_NAME",
-    "CLOUDINARY_API_KEY",
-    "CLOUDINARY_API_SECRET",
-  ] as const;
-
-  for (const variable of cloudinaryValues) {
-    const value = process.env[variable]?.trim();
-
-    if (value && /\s/.test(value)) {
-      errors.push(`${variable} must not contain whitespace`);
-    }
-  }
-
-  // ==========================================
   // PORT VALIDATION
   // ==========================================
 
@@ -220,10 +178,7 @@ const validateEnv = (): void => {
     "test",
   ];
 
-  if (
-    nodeEnv &&
-    !allowedEnvironments.includes(nodeEnv)
-  ) {
+  if (nodeEnv && !allowedEnvironments.includes(nodeEnv)) {
     errors.push(
       "NODE_ENV must be development, production, or test"
     );
