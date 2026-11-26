@@ -1,36 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dream Shop – Frontend
 
-## Getting Started
+React + TypeScript + Vite + Tailwind CSS storefront and admin panel for the
+Dream Shop backend.
 
-First, run the development server:
+## Requirements
+
+- Node.js 18.18 or newer
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd frontend
+cp .env.example .env     # Windows CMD: copy .env.example .env
+npm install
+npm run dev              # http://localhost:5173
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Start the backend too (`npm run dev` inside `backend`). In the backend `.env`,
+`FRONTEND_URL` must include `http://localhost:5173`, otherwise the backend
+rejects requests with 403 (CSRF origin check).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+In development the browser talks to `/api` on the Vite server, which proxies
+to `VITE_DEV_PROXY_TARGET` (default `http://localhost:5000`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server |
+| `npm run typecheck` | TypeScript check only |
+| `npm run build` | Typecheck + production build into `dist/` |
+| `npm run preview` | Serve the production build locally |
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy to Vercel (free)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push the repo to GitHub (the project lives in the `frontend` folder).
+2. Vercel → Add New Project → import the repo.
+3. **Root Directory:** `frontend`. Framework preset: Vite.
+4. Environment variable: `VITE_API_URL` = `/api`
+5. Deploy.
+6. Copy the production URL (for example `https://dream-shop.vercel.app`) and set
+   it as `FRONTEND_URL` in the Render backend environment (no trailing slash,
+   no path). Keep `http://localhost:5173` after a comma if you still develop locally.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`vercel.json` proxies `/api/*` to the Render backend, so the login cookie is
+first-party and works in Safari and other strict browsers. It also rewrites
+all other paths to `index.html` for client-side routing.
 
-## Deploy on Vercel
+## Structure
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+  components/{ui,common,layout}   Reusable UI
+  constants/                      Status labels, order transitions
+  contexts/AuthContext.tsx        Session restoration and auth actions
+  layouts/                        Public and admin layouts
+  lib/                            Query client and query keys
+  pages/                          Page components (public, auth, customer, admin)
+  routes/                         Router and route guards
+  services/                       One typed module per backend resource
+  styles/index.css                Design tokens
+  types/                          Models and API response types
+  utils/                          Formatting, errors, class names
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Conventions
+
+- All HTTP goes through `src/services/api.ts` (cookies, CSRF header, errors).
+- Server state lives in TanStack Query; never filter or sort on the client when
+  the API supports it.
+- Prices are shown in BDT (৳). Only Cash on Delivery is offered at checkout.

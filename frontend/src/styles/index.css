@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   Dream Shop design tokens
+   Warm paper background, near-black ink, one clay accent.
+   ------------------------------------------------------------------ */
+@layer base {
+  :root {
+    --paper: 247 244 238;
+    --surface: 255 255 255;
+    --ink: 24 22 18;
+    --muted: 98 92 82;
+    --line: 224 218 207;
+
+    --accent: 168 68 38;
+    --accent-deep: 128 48 24;
+    --accent-soft: 245 226 217;
+
+    --moss: 48 100 68;
+    --moss-soft: 222 236 226;
+
+    --amber: 138 96 14;
+    --amber-soft: 248 236 204;
+
+    --danger: 176 38 38;
+    --danger-soft: 248 224 224;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display tracking-tight;
+  }
+
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent));
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: rgb(var(--accent-soft));
+  }
+
+  img {
+    @apply max-w-full;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
