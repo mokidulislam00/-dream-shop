@@ -12,6 +12,7 @@ import {
 import { Container } from "@/components/layout/Container";
 import { buttonStyles } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
+import { useCart } from "@/hooks/useCart";
 import { cn } from "@/utils/cn";
 
 const NAV_LINKS = [
@@ -26,6 +27,8 @@ const iconLink =
 
 export function Header() {
   const { user, status, isAdmin } = useAuth();
+  const { data: cartData } = useCart();
+  const cartCount = cartData?.summary?.totalItems ?? 0;
   const navigate = useNavigate();
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -111,8 +114,21 @@ export function Header() {
           <Link to="/wishlist" className={iconLink} aria-label="Wishlist">
             <Heart className="h-5 w-5" />
           </Link>
-          <Link to="/cart" className={iconLink} aria-label="Cart">
+          <Link
+            to="/cart"
+            className={cn(iconLink, "relative")}
+            aria-label={cartCount > 0 ? `Cart, ${cartCount} items` : "Cart"}
+          >
             <ShoppingBag className="h-5 w-5" />
+            {cartCount > 0 ? (
+              <span
+                key={cartCount}
+                aria-hidden="true"
+                className="cart-bump absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold text-white"
+              >
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            ) : null}
           </Link>
 
           {status === "loading" ? (

@@ -7,7 +7,13 @@ import { Loader2 } from "lucide-react";
 
 import { cn } from "@/utils/cn";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+export type ButtonVariant =
+  | "primary"
+  | "secondary"
+  | "ghost"
+  | "danger"
+  | "accent"
+  | "light";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const base =
@@ -20,6 +26,9 @@ const variants: Record<ButtonVariant, string> = {
     "border border-ink/25 bg-surface text-ink hover:border-ink hover:bg-paper",
   ghost: "text-ink hover:bg-ink/5",
   danger: "bg-danger text-white hover:bg-danger/90",
+  // For dark backgrounds
+  accent: "bg-accent text-white hover:bg-paper hover:text-ink",
+  light: "border border-paper/40 text-paper hover:bg-paper/10",
 };
 
 const sizes: Record<ButtonSize, string> = {

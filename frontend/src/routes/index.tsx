@@ -1,24 +1,40 @@
+import type { ComponentType } from "react";
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
 import ComingSoon from "@/pages/ComingSoon";
-import NotFoundPage from "@/pages/public/NotFoundPage";
 import { GuestOnly, RequireAdmin, RequireAuth } from "./guards";
 
+// Route-level code splitting: a page's code loads when first visited.
+const lazyPage =
+  (loader: () => Promise<{ default: ComponentType }>) => async () => ({
+    Component: (await loader()).default,
+  });
+
+// Temporary route target for pages built in later phases.
 const stub = (title: string, phase: number): RouteObject["element"] => (
   <ComingSoon title={title} phase={phase} />
 );
 
 const publicRoutes: RouteObject[] = [
-  { index: true, element: stub("Home", 3) },
-  { path: "products", element: stub("All products", 3) },
-  { path: "products/:id", element: stub("Product details", 3) },
-  { path: "categories", element: stub("Categories", 3) },
-  { path: "categories/:id", element: stub("Category products", 3) },
-  { path: "search", element: stub("Search results", 3) },
-  { path: "about", element: stub("About", 3) },
-  { path: "contact", element: stub("Contact", 3) },
+  { index: true, lazy: lazyPage(() => import("@/pages/public/HomePage")) },
+  { path: "products", lazy: lazyPage(() => import("@/pages/public/ProductsPage")) },
+  {
+    path: "products/:id",
+    lazy: lazyPage(() => import("@/pages/public/ProductDetailPage")),
+  },
+  {
+    path: "categories",
+    lazy: lazyPage(() => import("@/pages/public/CategoriesPage")),
+  },
+  {
+    path: "categories/:id",
+    lazy: lazyPage(() => import("@/pages/public/CategoryPage")),
+  },
+  { path: "search", lazy: lazyPage(() => import("@/pages/public/SearchPage")) },
+  { path: "about", lazy: lazyPage(() => import("@/pages/public/AboutPage")) },
+  { path: "contact", lazy: lazyPage(() => import("@/pages/public/ContactPage")) },
 ];
 
 const guestRoutes: RouteObject[] = [
@@ -74,11 +90,14 @@ const adminRoutes: RouteObject = {
 export const router = createBrowserRouter([
   {
     element: <PublicLayout />,
-    children: [
+      children: [
       ...publicRoutes,
       ...guestRoutes,
       ...customerRoutes,
-      { path: "*", element: <NotFoundPage /> },
+      {
+        path: "*",
+        lazy: lazyPage(() => import("@/pages/public/NotFoundPage")),
+      },
     ],
   },
   adminRoutes,

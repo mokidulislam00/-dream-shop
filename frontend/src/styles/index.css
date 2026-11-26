@@ -60,8 +60,164 @@
     *,
     *::before,
     *::after {
-      animation-duration: 0.01ms !important;
       transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------
+   Gadget illustration and micro-interactions.
+   Defined only when the visitor has not asked for reduced motion, so
+   everything is simply static for people who prefer that.
+   ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: no-preference) {
+  .gs-float {
+    animation: gs-float 6s ease-in-out infinite;
+  }
+  .gs-d2 {
+    animation-delay: -2s;
+  }
+  .gs-d3 {
+    animation-delay: -4s;
+  }
+  .gs-tile {
+    animation: gs-tile 4.5s ease-in-out infinite;
+  }
+  .gs-wave {
+    animation: gs-wave 2.4s ease-out infinite;
+    opacity: 0;
+  }
+  .gs-trace {
+    stroke-dasharray: 3 9;
+    animation: gs-trace 2s linear infinite;
+  }
+  .gs-wheel {
+    animation: gs-wheel 2.2s ease-in-out infinite;
+  }
+  .gs-click {
+    animation: gs-click 3.2s ease-in-out infinite;
+    opacity: 0;
+  }
+  .gs-beat {
+    stroke-dasharray: 130;
+    animation: gs-beat 2.6s linear infinite;
+  }
+  .gs-blink {
+    animation: gs-blink 2.8s ease-in-out infinite;
+  }
+  .rise {
+    animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .rise-2 {
+    animation-delay: 0.12s;
+  }
+  .rise-3 {
+    animation-delay: 0.24s;
+  }
+  .cart-bump {
+    animation: bump 0.35s ease;
+  }
+  .group:hover .icon-wiggle {
+    animation: wiggle 0.6s ease;
+  }
+
+  @keyframes gs-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+  @keyframes gs-tile {
+    0%,
+    70%,
+    100% {
+      opacity: 0.25;
+    }
+    20%,
+    45% {
+      opacity: 1;
+    }
+  }
+  @keyframes gs-wave {
+    0% {
+      opacity: 0;
+      transform: translateX(-6px);
+    }
+    30% {
+      opacity: 0.9;
+    }
+    100% {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+  }
+  @keyframes gs-trace {
+    to {
+      stroke-dashoffset: -24;
+    }
+  }
+  @keyframes gs-wheel {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(8px);
+    }
+  }
+  @keyframes gs-click {
+    0%,
+    60%,
+    100% {
+      opacity: 0;
+    }
+    70%,
+    85% {
+      opacity: 0.75;
+    }
+  }
+  @keyframes gs-beat {
+    from {
+      stroke-dashoffset: 130;
+    }
+    to {
+      stroke-dashoffset: -130;
+    }
+  }
+  @keyframes gs-blink {
+    0%,
+    100% {
+      opacity: 0.25;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  @keyframes bump {
+    50% {
+      transform: scale(1.35);
+    }
+  }
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(-12deg);
+    }
+    75% {
+      transform: rotate(12deg);
     }
   }
 }

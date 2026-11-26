@@ -2,6 +2,7 @@ import { Outlet, ScrollRestoration } from "react-router-dom";
 
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { siteConfig } from "@/constants/site";
 
 export default function PublicLayout() {
   return (
@@ -12,6 +13,11 @@ export default function PublicLayout() {
       >
         Skip to content
       </a>
+      {siteConfig.announcement ? (
+        <div className="bg-ink px-4 py-2 text-center text-sm text-paper">
+          {siteConfig.announcement}
+        </div>
+      ) : null}
       <Header />
       <main id="main" className="flex-1">
         <Outlet />
