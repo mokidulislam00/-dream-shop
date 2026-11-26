@@ -448,7 +448,7 @@ export const createOrder = async (
           }),
           text: `Hi ${customer.fullName},
 
-Thank you for shopping with MiniMart. Your order has been placed successfully.
+Thank you for shopping with Dream Shop. Your order has been placed successfully.
 
 Order ID: ${createdOrder._id.toString()}
 Order Status: ${createdOrder.orderStatus}
@@ -461,8 +461,8 @@ Subtotal: ৳${createdOrder.subtotal.toFixed(2)}
 Shipping: ৳${createdOrder.shippingCost.toFixed(2)}
 Total: ৳${createdOrder.totalAmount.toFixed(2)}
 
-Thank you for choosing MiniMart!
-MiniMart Team`,
+Thank you for choosing Dream Shop!
+Dream Shop Team`,
         });
       } else {
         console.warn(
@@ -973,7 +973,7 @@ export const updateOrderStatus = async (
 
         await sendEmail({
           to: customer.email,
-          subject: `MiniMart Order Update - ${requestedStatus.toUpperCase()}`,
+          subject: `Dream Shop Order Update - ${requestedStatus.toUpperCase()}`,
           html: orderStatusUpdateEmailTemplate({
             customerName: customer.fullName,
             orderId: order._id.toString(),
@@ -986,7 +986,7 @@ export const updateOrderStatus = async (
           }),
           text: `Hi ${customer.fullName},
 
-Your MiniMart order status has been updated.
+Your Dream Shop order status has been updated.
 
 Order ID: ${order._id.toString()}
 New Order Status: ${requestedStatus.toUpperCase()}
@@ -999,8 +999,8 @@ Subtotal: ৳${order.subtotal.toFixed(2)}
 Shipping: ৳${order.shippingCost.toFixed(2)}
 Total: ৳${order.totalAmount.toFixed(2)}
 
-Thank you for choosing MiniMart!
-MiniMart Team`,
+Thank you for choosing Dream Shop!
+Dream Shop Team`,
         });
 
         console.log(

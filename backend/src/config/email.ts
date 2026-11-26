@@ -17,7 +17,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Reads and validates the Brevo API credentials and sender information.
  *
  * EMAIL_FROM accepts either:
- * MiniMart <verified-sender@example.com>
+ * Dream Shop <verified-sender@example.com>
  * or:
  * verified-sender@example.com
  */

@@ -48,7 +48,7 @@ const startServer = async (): Promise<void> => {
     server = app.listen(PORT, () => {
       console.log(`
 ========================================
-  MiniMart API Server
+  Dream Shop API Server
 ========================================
   Status: Running
   Port: ${PORT}

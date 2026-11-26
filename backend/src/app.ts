@@ -128,7 +128,7 @@ app.get(
   (_req: Request, res: Response) => {
     res.status(200).json({
       success: true,
-      message: "MiniMart API is running",
+      message: "Dream Shop API is running",
       status: "ok",
       timestamp: new Date().toISOString(),
     });

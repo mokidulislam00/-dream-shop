@@ -32,9 +32,10 @@ const productFields = {
     .number()
     .positive("Price must be greater than 0"),
 
+  // A discount price of 0 would make the product free, so it must be positive.
   discountPrice: z
     .number()
-    .nonnegative("Discount price cannot be negative")
+    .positive("Discount price must be greater than 0")
     .optional(),
 
   category: objectIdSchema,
@@ -71,13 +72,14 @@ const productFields = {
 const validateDiscountPrice = (
   data: {
     price?: number;
-    discountPrice?: number;
+    discountPrice?: number | null;
   },
   ctx: z.RefinementCtx
 ): void => {
   if (
     data.price !== undefined &&
     data.discountPrice !== undefined &&
+    data.discountPrice !== null &&
     data.discountPrice >= data.price
   ) {
     ctx.addIssue({
@@ -94,8 +96,16 @@ export const createProductSchema = z
   .superRefine(validateDiscountPrice);
 
 // Update product validation
+// On update, discountPrice may be null to remove an existing discount.
 export const updateProductSchema = z
-  .object(productFields)
+  .object({
+    ...productFields,
+    discountPrice: z
+      .number()
+      .positive("Discount price must be greater than 0")
+      .nullable()
+      .optional(),
+  })
   .partial()
   .superRefine((data, ctx) => {
     if (Object.keys(data).length === 0) {

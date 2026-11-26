@@ -27,6 +27,14 @@ interface ProductInput {
   isFeatured?: boolean;
 }
 
+// Product update input type (discountPrice: null removes the discount)
+type ProductUpdateInput = Omit<
+  Partial<ProductInput>,
+  "discountPrice"
+> & {
+  discountPrice?: number | null;
+};
+
 // Validate MongoDB ObjectId
 const isValidObjectId = (value: unknown): value is string => {
   return (
@@ -506,7 +514,7 @@ export const updateProduct = async (
     ] as const;
 
     const body = requestBody as Record<string, unknown>;
-    const updates: Partial<ProductInput> = {};
+    const updates: ProductUpdateInput = {};
 
     for (const field of allowedFields) {
       if (Object.prototype.hasOwnProperty.call(body, field)) {
@@ -585,8 +593,39 @@ export const updateProduct = async (
       return;
     }
 
-    // Apply validated updates
-    product.set(updates);
+    // Keep Cloudinary public IDs aligned with the image URL list when
+    // the images array is replaced. URLs that already existed keep their
+    // public ID; new external URLs get an empty ID.
+    if (Array.isArray(updates.images)) {
+      const previousIds = product.imagePublicIds || [];
+      const publicIdByUrl = new Map<string, string>();
+
+      product.images.forEach((url, index) => {
+        publicIdByUrl.set(url, previousIds[index] || "");
+      });
+
+      product.imagePublicIds = updates.images.map(
+        (url) => publicIdByUrl.get(url) ?? ""
+      );
+    }
+
+    // Apply validated updates. A null discountPrice removes the discount.
+    const { discountPrice: discountUpdate, ...otherUpdates } =
+      updates;
+
+    product.set(otherUpdates);
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        updates,
+        "discountPrice"
+      )
+    ) {
+      product.set(
+        "discountPrice",
+        discountUpdate === null ? undefined : discountUpdate
+      );
+    }
 
     await product.save();
 

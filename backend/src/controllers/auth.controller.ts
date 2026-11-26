@@ -43,18 +43,18 @@ export const register = async (
     try {
       await sendEmail({
         to: user.email,
-        subject: "Welcome to MiniMart!",
+        subject: "Welcome to Dream Shop!",
         html: welcomeEmailTemplate(user.fullName),
         text: `Hi ${user.fullName},
 
-Welcome to MiniMart!
+Welcome to Dream Shop!
 
 Your account has been created successfully.
 
 Thank you for joining our shopping community.
 
 Best Regards,
-MiniMart Team`,
+Dream Shop Team`,
       });
 
       console.log(`[EMAIL] Welcome email sent to ${user.email}`);

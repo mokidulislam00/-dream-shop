@@ -16,7 +16,7 @@ interface OrderStatusUpdateEmailOptions {
   paymentMethod: string;
 }
 
-const APP_NAME = "MiniMart";
+const APP_NAME = "Dream Shop";
 const APP_COLOR = "#2563eb";
 
 // Escape dynamic values before inserting them into HTML.
@@ -155,7 +155,7 @@ export const orderStatusUpdateEmailTemplate = ({
                     </h2>
 
                     <p style="font-size: 15px; line-height: 1.7;">
-                      There is an update to your MiniMart order.
+                      There is an update to your Dream Shop order.
                     </p>
 
                     <div style="

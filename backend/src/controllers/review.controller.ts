@@ -102,7 +102,7 @@ export const createReview = async (
     const review = await Review.findOne({
       user: userId,
       product: productId,
-    }).populate("user", "name");
+    }).populate("user", "fullName");
 
     res.status(201).json({
       success: true,
@@ -166,7 +166,7 @@ export const getProductReviews = async (
 
     const [reviews, totalReviews, ratingStats] = await Promise.all([
       Review.find({ product: productId })
-        .populate("user", "name")
+        .populate("user", "fullName")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
@@ -274,7 +274,7 @@ export const updateReview = async (
         new: true,
         runValidators: true,
       }
-    ).populate("user", "name");
+    ).populate("user", "fullName");
 
     if (!review) {
       res.status(404).json({

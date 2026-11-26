@@ -1,5 +1,5 @@
 
-const APP_NAME = "MiniMart";
+const APP_NAME = "Dream Shop";
 
 const APP_COLOR = "#2563eb";
 

@@ -80,7 +80,7 @@ export const orderConfirmationEmailTemplate = (
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Order Confirmation - MiniMart</title>
+        <title>Order Confirmation - Dream Shop</title>
       </head>
       <body style="margin: 0; padding: 0; background-color: #f4f7fb; font-family: Arial, Helvetica, sans-serif;">
         <table width="100%" cellpadding="0" cellspacing="0" style="padding: 32px 12px;">
@@ -89,7 +89,7 @@ export const orderConfirmationEmailTemplate = (
               <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 680px; background: #ffffff; border-radius: 12px; overflow: hidden;">
                 <tr>
                   <td style="background: #2563eb; padding: 28px 24px; text-align: center; color: #ffffff;">
-                    <h1 style="margin: 0; font-size: 28px;">MiniMart</h1>
+                    <h1 style="margin: 0; font-size: 28px;">Dream Shop</h1>
                     <p style="margin: 8px 0 0; font-size: 14px;">Order Confirmation</p>
                   </td>
                 </tr>
@@ -142,12 +142,12 @@ export const orderConfirmationEmailTemplate = (
                     </table>
 
                     <p style="margin: 24px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280;">We will keep you informed as your order progresses.</p>
-                    <p style="margin: 22px 0 0; font-size: 14px; color: #6b7280;">Thank you for choosing <strong>MiniMart</strong>!<br />MiniMart Team</p>
+                    <p style="margin: 22px 0 0; font-size: 14px; color: #6b7280;">Thank you for choosing <strong>Dream Shop</strong>!<br />Dream Shop Team</p>
                   </td>
                 </tr>
                 <tr>
                   <td style="background: #f4f7fb; padding: 18px; text-align: center; color: #777777; font-size: 12px;">
-                    &copy; ${new Date().getFullYear()} MiniMart. All rights reserved.
+                    &copy; ${new Date().getFullYear()} Dream Shop. All rights reserved.
                   </td>
                 </tr>
               </table>
