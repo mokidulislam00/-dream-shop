@@ -29,3 +29,8 @@ export const formatDateTime = (iso: string): string =>
     hour: "2-digit",
     minute: "2-digit",
   });
+
+// The backend has no order number, so the last 8 characters of the
+// order id are shown as a short reference.
+export const orderCode = (id: string): string =>
+  `#${id.slice(-8).toUpperCase()}`;

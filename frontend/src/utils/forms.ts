@@ -16,7 +16,8 @@ export function applyFieldErrors<T extends FieldValues>(
   let applied = false;
 
   for (const fieldError of error.fieldErrors) {
-    const name = fieldError.field as Path<T>;
+    // Nested errors arrive as e.g. "shippingAddress.phone".
+    const name = fieldError.field.replace(/^shippingAddress\./, "") as Path<T>;
 
     if (fields.includes(name)) {
       setError(name, { type: "server", message: fieldError.message });

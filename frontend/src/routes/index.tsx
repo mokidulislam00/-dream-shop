@@ -54,12 +54,24 @@ const customerRoutes: RouteObject[] = [
   {
     element: <RequireAuth />,
     children: [
-      { path: "cart", element: stub("Cart", 5) },
-      { path: "wishlist", element: stub("Wishlist", 5) },
-      { path: "checkout", element: stub("Checkout", 5) },
-      { path: "order-confirmation/:id", element: stub("Order confirmed", 5) },
-      { path: "orders", element: stub("My orders", 5) },
-      { path: "orders/:id", element: stub("Order details", 5) },
+      { path: "cart", lazy: lazyPage(() => import("@/pages/customer/CartPage")) },
+      {
+        path: "wishlist",
+        lazy: lazyPage(() => import("@/pages/customer/WishlistPage")),
+      },
+      {
+        path: "checkout",
+        lazy: lazyPage(() => import("@/pages/customer/CheckoutPage")),
+      },
+      {
+        path: "order-confirmation/:id",
+        lazy: lazyPage(() => import("@/pages/customer/OrderConfirmationPage")),
+      },
+      { path: "orders", lazy: lazyPage(() => import("@/pages/customer/OrdersPage")) },
+      {
+        path: "orders/:id",
+        lazy: lazyPage(() => import("@/pages/customer/OrderDetailPage")),
+      },
       { path: "account", element: stub("Account settings", 5) },
     ],
   },
