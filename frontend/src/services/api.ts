@@ -4,6 +4,8 @@ import { ApiError, type FieldError } from "@/utils/errors";
 
 export const AUTH_EXPIRED_EVENT = "dream-shop:auth-expired";
 
+export type AuthEndReason = "expired" | "blocked";
+
 const SAFE_METHODS = new Set(["get", "head", "options"]);
 
 // One axios instance for the whole app.
@@ -67,10 +69,25 @@ api.interceptors.response.use(
     const apiError = toApiError(error);
     const url = axios.isAxiosError(error) ? (error.config?.url ?? "") : "";
 
-    // An expired session on a protected call. Auth endpoints handle their
-    // own 401s (wrong password, not logged in).
-    if (apiError.status === 401 && !url.startsWith("/auth/")) {
-      window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT));
+    // The session ended during a protected call. Auth endpoints handle
+    // their own errors (wrong password, not logged in, blocked at login).
+    if (!url.startsWith("/auth/")) {
+      if (apiError.status === 401) {
+        window.dispatchEvent(
+          new CustomEvent<AuthEndReason>(AUTH_EXPIRED_EVENT, {
+            detail: "expired",
+          })
+        );
+      } else if (
+        apiError.status === 403 &&
+        /account is blocked/i.test(apiError.message)
+      ) {
+        window.dispatchEvent(
+          new CustomEvent<AuthEndReason>(AUTH_EXPIRED_EVENT, {
+            detail: "blocked",
+          })
+        );
+      }
     }
 
     return Promise.reject(apiError);

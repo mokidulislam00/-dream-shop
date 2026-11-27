@@ -6,11 +6,15 @@ import {
   useMemo,
   type ReactNode,
 } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useQuery,
+  useQueryClient,
+  type QueryClient,
+} from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { queryKeys } from "@/lib/queryKeys";
-import { AUTH_EXPIRED_EVENT } from "@/services/api";
+import { AUTH_EXPIRED_EVENT, type AuthEndReason } from "@/services/api";
 import {
   authService,
   type LoginInput,
@@ -34,6 +38,19 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+// Cached data that belongs to a signed-in user.
+const PRIVATE_QUERY_ROOTS = new Set(["cart", "wishlist", "orders", "admin"]);
+
+// Ends the local session: marks the user as signed out and drops private
+// cached data. The auth query itself is updated (not removed) so the
+// components watching it re-render immediately.
+const endSession = (client: QueryClient): void => {
+  client.setQueryData(queryKeys.auth.me, null);
+  client.removeQueries({
+    predicate: (query) => PRIVATE_QUERY_ROOTS.has(String(query.queryKey[0])),
+  });
+};
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
@@ -72,21 +89,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     status = user ? "authenticated" : "guest";
   }
 
-  // A protected request returned 401: the session expired.
+  // A protected request showed the session ended (expired or blocked).
   useEffect(() => {
-    const handleExpired = () => {
+    const handleEnded = (event: Event) => {
+      const reason = (event as CustomEvent<AuthEndReason>).detail;
       const hadUser = queryClient.getQueryData(queryKeys.auth.me) !== null;
 
-      queryClient.clear();
-      queryClient.setQueryData(queryKeys.auth.me, null);
+      endSession(queryClient);
 
       if (hadUser) {
-        toast.error("Your session has expired. Please sign in again.");
+        toast.error(
+          reason === "blocked"
+            ? "Your account has been blocked. Please contact us if you think this is a mistake."
+            : "Your session has expired. Please sign in again."
+        );
       }
     };
 
-    window.addEventListener(AUTH_EXPIRED_EVENT, handleExpired);
-    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleExpired);
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleEnded);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleEnded);
   }, [queryClient]);
 
   const setUser = useCallback(
@@ -118,11 +139,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     try {
       await authService.logout();
-    } finally {
-      // Drop every cached private resource (cart, orders, admin data).
-      queryClient.clear();
-      queryClient.setQueryData(queryKeys.auth.me, null);
+    } catch (error) {
+      // If the server could not be reached the cookie is still valid, so
+      // stay signed in and let the caller report the failure.
+      if (!(error instanceof ApiError && error.status === 401)) {
+        throw error;
+      }
     }
+
+    endSession(queryClient);
   }, [queryClient]);
 
   const retry = useCallback(() => {

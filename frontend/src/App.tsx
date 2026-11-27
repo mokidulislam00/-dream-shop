@@ -11,7 +11,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <RouterProvider router={router} fallbackElement={<PageSpinner label="Loading" />} />
+        <RouterProvider
+          router={router}
+          fallbackElement={<PageSpinner label="Loading" />}
+          future={{ v7_startTransition: true }}
+        />
         <Toaster position="bottom-right" closeButton />
       </AuthProvider>
     </QueryClientProvider>

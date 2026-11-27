@@ -5,10 +5,10 @@ import {
   Menu,
   Search,
   ShoppingBag,
-  User as UserIcon,
   X,
 } from "lucide-react";
 
+import { AccountMenu } from "@/components/layout/AccountMenu";
 import { Container } from "@/components/layout/Container";
 import { buttonStyles } from "@/components/ui/Button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -143,9 +143,7 @@ export function Header() {
                   Admin
                 </Link>
               ) : null}
-              <Link to="/account" className={iconLink} aria-label="My account">
-                <UserIcon className="h-5 w-5" />
-              </Link>
+              <AccountMenu />
             </>
           ) : (
             <Link

@@ -41,8 +41,11 @@ const guestRoutes: RouteObject[] = [
   {
     element: <GuestOnly />,
     children: [
-      { path: "login", element: stub("Sign in", 4) },
-      { path: "register", element: stub("Create account", 4) },
+      { path: "login", lazy: lazyPage(() => import("@/pages/auth/LoginPage")) },
+      {
+        path: "register",
+        lazy: lazyPage(() => import("@/pages/auth/RegisterPage")),
+      },
     ],
   },
 ];

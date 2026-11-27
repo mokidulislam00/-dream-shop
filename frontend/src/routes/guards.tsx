@@ -5,6 +5,7 @@ import { EmptyState } from "@/components/common/EmptyState";
 import { ErrorState } from "@/components/common/ErrorState";
 import { buttonStyles } from "@/components/ui/Button";
 import { PageSpinner } from "@/components/ui/Spinner";
+import { safeRedirectPath } from "@/utils/forms";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface LocationState {
@@ -70,8 +71,10 @@ export function GuestOnly() {
   }
 
   if (status === "authenticated") {
-    const from = (location.state as LocationState | null)?.from;
-    return <Navigate to={from ?? (isAdmin ? "/admin" : "/account")} replace />;
+    const from = safeRedirectPath(
+      (location.state as LocationState | null)?.from
+    );
+    return <Navigate to={from ?? (isAdmin ? "/admin" : "/")} replace />;
   }
 
   return <Outlet />;
