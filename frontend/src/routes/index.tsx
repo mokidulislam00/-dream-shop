@@ -3,7 +3,6 @@ import { createBrowserRouter, type RouteObject } from "react-router-dom";
 
 import AdminLayout from "@/layouts/AdminLayout";
 import PublicLayout from "@/layouts/PublicLayout";
-import ComingSoon from "@/pages/ComingSoon";
 import { GuestOnly, RequireAdmin, RequireAuth } from "./guards";
 
 // Route-level code splitting: a page's code loads when first visited.
@@ -11,11 +10,6 @@ const lazyPage =
   (loader: () => Promise<{ default: ComponentType }>) => async () => ({
     Component: (await loader()).default,
   });
-
-// Temporary route target for pages built in later phases.
-const stub = (title: string, phase: number): RouteObject["element"] => (
-  <ComingSoon title={title} phase={phase} />
-);
 
 const publicRoutes: RouteObject[] = [
   { index: true, lazy: lazyPage(() => import("@/pages/public/HomePage")) },
@@ -94,10 +88,22 @@ const adminRoutes: RouteObject = {
               index: true,
               lazy: lazyPage(() => import("@/pages/admin/DashboardPage")),
             },
-            { path: "products", element: stub("Products", 6) },
-            { path: "products/new", element: stub("New product", 6) },
-            { path: "products/:id/edit", element: stub("Edit product", 6) },
-            { path: "categories", element: stub("Categories", 6) },
+            {
+              path: "products",
+              lazy: lazyPage(() => import("@/pages/admin/AdminProductsPage")),
+            },
+            {
+              path: "products/new",
+              lazy: lazyPage(() => import("@/pages/admin/AdminProductFormPage")),
+            },
+            {
+              path: "products/:id/edit",
+              lazy: lazyPage(() => import("@/pages/admin/AdminProductFormPage")),
+            },
+            {
+              path: "categories",
+              lazy: lazyPage(() => import("@/pages/admin/AdminCategoriesPage")),
+            },
             {
               path: "orders",
               lazy: lazyPage(() => import("@/pages/admin/OrdersPage")),
