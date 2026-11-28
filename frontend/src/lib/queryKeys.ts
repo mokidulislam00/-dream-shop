@@ -19,6 +19,7 @@ export const queryKeys = {
     detail: (id: string) => ["orders", "detail", id] as const,
   },
   reviews: {
+    product: (productId: string) => ["reviews", productId] as const,
     forProduct: (productId: string, params: object) =>
       ["reviews", productId, params] as const,
   },

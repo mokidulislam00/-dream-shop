@@ -22,8 +22,8 @@ import { isClientError } from "@/utils/errors";
 
 const LOW_STOCK_THRESHOLD = 5;
 
-function StockStatus({ stock }: { stock: number }) {
-  if (stock === 0) {
+function StockStatus({ stock, unavailable }: { stock: number; unavailable: boolean }) {
+  if (stock === 0 || unavailable) {
     return <Badge tone="danger">Out of stock</Badge>;
   }
 
@@ -39,7 +39,7 @@ function ProductDetail({ product }: { product: Product }) {
   const requireAuth = useRequireAuth();
   const addToCart = useAddToCart();
 
-  const soldOut = product.stock === 0;
+  const soldOut = product.stock === 0 || product.status !== "active";
   const percent = discountPercent(product);
 
   const handleAdd = () => {
@@ -75,7 +75,9 @@ function ProductDetail({ product }: { product: Product }) {
 
         <div>
           {product.brand ? (
-            <p className="text-sm uppercase tracking-wide text-muted">{product.brand}</p>
+            <p className="text-sm text-muted">
+              Brand: <span className="font-medium text-ink">{product.brand}</span>
+            </p>
           ) : null}
           <h1 className="mt-1 text-3xl sm:text-4xl">{product.name}</h1>
 
@@ -85,7 +87,7 @@ function ProductDetail({ product }: { product: Product }) {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <StockStatus stock={product.stock} />
+            <StockStatus stock={product.stock} unavailable={product.status !== "active"} />
             <span className="text-sm text-muted">SKU {product.sku}</span>
           </div>
 

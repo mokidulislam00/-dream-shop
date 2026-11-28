@@ -72,7 +72,10 @@ const customerRoutes: RouteObject[] = [
         path: "orders/:id",
         lazy: lazyPage(() => import("@/pages/customer/OrderDetailPage")),
       },
-      { path: "account", element: stub("Account settings", 5) },
+      {
+        path: "account",
+        lazy: lazyPage(() => import("@/pages/customer/AccountPage")),
+      },
     ],
   },
 ];

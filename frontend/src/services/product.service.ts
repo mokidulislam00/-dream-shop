@@ -17,6 +17,7 @@ export interface ProductListParams {
   minPrice?: number;
   maxPrice?: number;
   featured?: boolean;
+  inStock?: boolean;
   page?: number;
   limit?: number;
   sort?: ProductSort;

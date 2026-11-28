@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { queryKeys } from "@/lib/queryKeys";
 import { cartService } from "@/services/cart.service";
+import { wishlistService } from "@/services/wishlist.service";
 import { getErrorMessage } from "@/utils/errors";
 
 const refreshCart = (queryClient: QueryClient) =>
@@ -94,6 +95,51 @@ export function useClearCart() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error));
+    },
+  });
+}
+
+// Moves an unavailable product from the cart to the wishlist.
+export function useSaveForLater() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (productId: string) => {
+      await wishlistService.add(productId);
+      await cartService.remove(productId);
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        refreshCart(queryClient),
+        queryClient.invalidateQueries({ queryKey: queryKeys.wishlist }),
+      ]);
+      toast.success("Saved to your wishlist");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+      void refreshCart(queryClient);
+    },
+  });
+}
+
+// Removes several products one after another (the cart is updated in
+// sequence to avoid overlapping writes).
+export function useRemoveManyFromCart() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (productIds: string[]) => {
+      for (const productId of productIds) {
+        await cartService.remove(productId);
+      }
+    },
+    onSuccess: async () => {
+      await refreshCart(queryClient);
+      toast.success("Unavailable items removed");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error));
+      void refreshCart(queryClient);
     },
   });
 }

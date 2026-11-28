@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useState,
   type ReactNode,
 } from "react";
 import {
@@ -25,11 +26,37 @@ import { ApiError } from "@/utils/errors";
 
 export type AuthStatus = "loading" | "authenticated" | "guest" | "error";
 
+// A harmless boolean hint (never a token) used only to pick the right
+// placeholder while the session check is still running.
+const HINT_KEY = "dream-shop:signed-in";
+
+const readHint = (): boolean => {
+  try {
+    return window.localStorage.getItem(HINT_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+const writeHint = (signedIn: boolean): void => {
+  try {
+    if (signedIn) {
+      window.localStorage.setItem(HINT_KEY, "1");
+    } else {
+      window.localStorage.removeItem(HINT_KEY);
+    }
+  } catch {
+    // Storage can be unavailable (private mode); the hint is optional.
+  }
+};
+
 interface AuthContextValue {
   user: User | null;
   status: AuthStatus;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  // While the session check runs: was the visitor signed in last time?
+  likelySignedIn: boolean;
   login: (input: LoginInput) => Promise<User>;
   register: (input: RegisterInput) => Promise<User>;
   logout: () => Promise<void>;
@@ -78,6 +105,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const user = query.data ?? null;
+  const [hint] = useState(readHint);
 
   let status: AuthStatus;
 
@@ -88,6 +116,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } else {
     status = user ? "authenticated" : "guest";
   }
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      writeHint(true);
+    } else if (status === "guest") {
+      writeHint(false);
+    }
+  }, [status]);
 
   // A protected request showed the session ended (expired or blocked).
   useEffect(() => {
@@ -160,13 +196,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       status,
       isAuthenticated: status === "authenticated",
       isAdmin: user?.role === "admin",
+      likelySignedIn: status === "loading" ? hint : user !== null,
       login,
       register,
       logout,
       setUser,
       retry,
     }),
-    [user, status, login, register, logout, setUser, retry]
+    [user, status, hint, login, register, logout, setUser, retry]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

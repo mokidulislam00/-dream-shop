@@ -62,6 +62,7 @@ export function ProductListing({
   const minPrice = toPrice(searchParams.get("minPrice"));
   const maxPrice = toPrice(searchParams.get("maxPrice"));
   const featured = searchParams.get("featured") === "true" ? true : undefined;
+  const inStock = searchParams.get("inStock") === "true" ? true : undefined;
 
   const params = useMemo(
     () => ({
@@ -71,11 +72,12 @@ export function ProductListing({
       minPrice,
       maxPrice,
       featured,
+      inStock,
       page,
       limit: PAGE_SIZE,
       sort,
     }),
-    [fixedSearch, category, brand, minPrice, maxPrice, featured, page, sort]
+    [fixedSearch, category, brand, minPrice, maxPrice, featured, inStock, page, sort]
   );
 
   const { data, isPending, isError, error, isFetching, refetch } =
@@ -106,6 +108,7 @@ export function ProductListing({
     minPrice !== undefined,
     maxPrice !== undefined,
     featured,
+    inStock,
   ].filter(Boolean).length;
 
   const clearFilters = () => {
@@ -144,6 +147,7 @@ export function ProductListing({
             minPrice={minPrice}
             maxPrice={maxPrice}
             featured={Boolean(featured)}
+            inStock={Boolean(inStock)}
             activeCount={activeFilterCount}
             onChange={update}
             onClear={clearFilters}

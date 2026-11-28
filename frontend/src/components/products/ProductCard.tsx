@@ -8,7 +8,7 @@ import type { Product } from "@/types/models";
 
 export function ProductCard({ product }: { product: Product }) {
   const percent = discountPercent(product);
-  const soldOut = product.stock === 0;
+  const soldOut = product.stock === 0 || product.status !== "active";
 
   return (
     <article className="group">
@@ -23,7 +23,9 @@ export function ProductCard({ product }: { product: Product }) {
             src={product.images[0]}
             alt=""
             width={500}
-            className="transition-transform duration-500 group-hover:scale-[1.03]"
+            className={`transition-transform duration-500 group-hover:scale-[1.03] ${
+              soldOut ? "opacity-60 grayscale" : ""
+            }`}
           />
         </Link>
 

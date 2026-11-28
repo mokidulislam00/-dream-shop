@@ -5,6 +5,7 @@ import {
   Menu,
   Search,
   ShoppingBag,
+  User as UserIcon,
   X,
 } from "lucide-react";
 
@@ -26,7 +27,7 @@ const iconLink =
   "inline-flex h-11 w-11 items-center justify-center rounded text-ink hover:bg-ink/5";
 
 export function Header() {
-  const { user, status, isAdmin } = useAuth();
+  const { user, status, isAdmin, likelySignedIn } = useAuth();
   const { data: cartData } = useCart();
   const cartCount = cartData?.summary?.totalItems ?? 0;
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/95 backdrop-blur">
-      <Container className="flex h-16 items-center gap-4 lg:gap-8">
+      <Container className="flex h-16 items-center gap-3 sm:gap-4 lg:gap-8">
         <button
           type="button"
           className={cn(iconLink, "-ml-2 lg:hidden")}
@@ -87,7 +88,10 @@ export function Header() {
           {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
 
-        <Link to="/" className="font-display text-2xl leading-none tracking-tight">
+        <Link
+          to="/"
+          className="font-display text-xl leading-none tracking-tight sm:text-2xl"
+        >
           Dream<span className="text-accent">Shop</span>
         </Link>
 
@@ -111,7 +115,11 @@ export function Header() {
         <div className="ml-auto hidden w-full max-w-xs lg:block">{searchForm}</div>
 
         <div className="ml-auto flex items-center lg:ml-0">
-          <Link to="/wishlist" className={iconLink} aria-label="Wishlist">
+          <Link
+            to="/wishlist"
+            className={cn(iconLink, "hidden sm:inline-flex")}
+            aria-label="Wishlist"
+          >
             <Heart className="h-5 w-5" />
           </Link>
           <Link
@@ -131,9 +139,7 @@ export function Header() {
             ) : null}
           </Link>
 
-          {status === "loading" ? (
-            <span className="ml-1 h-9 w-20 animate-pulse rounded bg-ink/10" />
-          ) : user ? (
+          {user ? (
             <>
               {isAdmin ? (
                 <Link
@@ -145,11 +151,16 @@ export function Header() {
               ) : null}
               <AccountMenu />
             </>
-          ) : (
-            <Link
-              to="/login"
-              className={buttonStyles("primary", "sm", "ml-1")}
+          ) : status === "loading" && likelySignedIn ? (
+            // Signed in last time: hold the account slot while we check.
+            <span
+              aria-hidden="true"
+              className="inline-flex h-11 w-11 items-center justify-center text-muted"
             >
+              <UserIcon className="h-5 w-5" />
+            </span>
+          ) : (
+            <Link to="/login" className={buttonStyles("primary", "sm", "ml-1")}>
               Sign in
             </Link>
           )}
@@ -178,12 +189,31 @@ export function Header() {
                   {link.label}
                 </NavLink>
               ))}
+              <NavLink
+                to="/wishlist"
+                className={({ isActive }) =>
+                  cn(
+                    "flex h-12 items-center border-b border-line text-base font-medium",
+                    isActive ? "text-accent" : "text-ink"
+                  )
+                }
+              >
+                Wishlist
+              </NavLink>
               {isAdmin ? (
                 <NavLink
                   to="/admin"
                   className="flex h-12 items-center text-base font-medium"
                 >
                   Admin dashboard
+                </NavLink>
+              ) : null}
+              {!user ? (
+                <NavLink
+                  to="/register"
+                  className="flex h-12 items-center text-base font-medium"
+                >
+                  Create account
                 </NavLink>
               ) : null}
             </nav>

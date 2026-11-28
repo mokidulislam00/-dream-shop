@@ -12,6 +12,7 @@ interface ProductFiltersProps {
   minPrice?: number;
   maxPrice?: number;
   featured: boolean;
+  inStock: boolean;
   activeCount: number;
   onChange: (patch: Record<string, string | undefined>) => void;
   onClear: () => void;
@@ -24,6 +25,7 @@ export function ProductFilters({
   minPrice,
   maxPrice,
   featured,
+  inStock,
   activeCount,
   onChange,
   onClear,
@@ -83,6 +85,18 @@ export function ProductFilters({
           className="h-5 w-5 rounded border-line accent-accent"
         />
         Featured products only
+      </label>
+
+      <label className="flex min-h-[44px] cursor-pointer items-center gap-3 text-sm">
+        <input
+          type="checkbox"
+          checked={inStock}
+          onChange={(event) =>
+            onChange({ inStock: event.target.checked ? "true" : undefined })
+          }
+          className="h-5 w-5 rounded border-line accent-accent"
+        />
+        In stock only
       </label>
     </div>
   );

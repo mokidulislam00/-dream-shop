@@ -58,15 +58,17 @@ const isDuplicateKeyError = (error: unknown): boolean => {
   );
 };
 
-// Get all active products with search, filters, sorting and pagination
+// Get all products (active and out of stock) with search, filters, sorting and pagination
 export const getAllProducts = async (
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> => {
   try {
+    // Out-of-stock products stay visible (shown as unavailable by the
+    // storefront). Inactive products are hidden.
     const filter: ProductFilter = {
-      status: "active",
+      status: { $in: ["active", "out_of_stock"] },
     };
 
     // Search products by name, description or brand
@@ -240,6 +242,24 @@ export const getAllProducts = async (
       filter.isFeatured = featured === "true";
     }
 
+    // Optionally show only products that can be bought right now
+    const inStock = req.query.inStock;
+
+    if (inStock !== undefined) {
+      if (inStock !== "true" && inStock !== "false") {
+        res.status(400).json({
+          success: false,
+          message: "Invalid inStock filter",
+        });
+        return;
+      }
+
+      if (inStock === "true") {
+        filter.status = "active";
+        filter.stock = { $gt: 0 };
+      }
+    }
+
     // Pagination
     const page = req.query.page ?? "1";
     const limit = req.query.limit ?? "12";
@@ -310,7 +330,7 @@ export const getAllProducts = async (
     const [products, totalProducts] = await Promise.all([
       Product.find(filter)
         .populate("category", "name slug")
-        .sort(sortBy)
+        .sort({ status: 1, ...sortBy })
         .skip(skip)
         .limit(pageSize)
         .lean(),
@@ -334,7 +354,7 @@ export const getAllProducts = async (
   }
 };
 
-// Get a single active product by ID
+// Get a single product by ID (active or out of stock)
 export const getProductById = async (
   req: Request,
   res: Response,
@@ -353,7 +373,7 @@ export const getProductById = async (
 
     const product = await Product.findOne({
       _id: id,
-      status: "active",
+      status: { $in: ["active", "out_of_stock"] },
     }).populate("category", "name slug");
 
     if (!product) {

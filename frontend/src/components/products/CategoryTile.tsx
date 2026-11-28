@@ -22,13 +22,13 @@ export function CategoryTile({ category }: { category: Category }) {
           />
         </div>
       ) : null}
-      <div className="flex items-start gap-3 p-4">
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-start">
         {category.image ? null : (
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded bg-ink text-paper transition-colors group-hover:bg-accent">
             <Icon className="icon-wiggle h-5 w-5" aria-hidden="true" />
           </span>
         )}
-        <div className="min-w-0">
+        <div className="min-w-0 break-words [overflow-wrap:anywhere]">
           <h3 className="font-sans text-base font-semibold tracking-normal group-hover:text-accent">
             {category.name}
           </h3>

@@ -40,7 +40,7 @@ function MoveToCartButton({ product }: { product: Product }) {
     },
   });
 
-  const soldOut = product.stock === 0;
+  const soldOut = product.stock === 0 || product.status !== "active";
 
   return (
     <Button

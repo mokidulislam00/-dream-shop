@@ -18,7 +18,7 @@ export const getWishlist = async (
       user: userId,
     }).populate({
       path: "products",
-      match: { status: "active" },
+      match: { status: { $in: ["active", "out_of_stock"] } },
       populate: {
         path: "category",
         select: "name slug",
@@ -60,7 +60,7 @@ export const addToWishlist = async (
 
     const product = await Product.findOne({
       _id: productId,
-      status: "active",
+      status: { $in: ["active", "out_of_stock"] },
     });
 
     if (!product) {
@@ -86,7 +86,7 @@ export const addToWishlist = async (
       }
     ).populate({
       path: "products",
-      match: { status: "active" },
+      match: { status: { $in: ["active", "out_of_stock"] } },
       populate: {
         path: "category",
         select: "name slug",
@@ -136,7 +136,7 @@ export const removeFromWishlist = async (
       }
     ).populate({
       path: "products",
-      match: { status: "active" },
+      match: { status: { $in: ["active", "out_of_stock"] } },
       populate: {
         path: "category",
         select: "name slug",

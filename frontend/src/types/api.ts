@@ -96,6 +96,8 @@ export interface CartResponse extends MessageResponse {
   cart: Cart;
   // Only returned by GET /cart
   summary?: CartSummary;
+  // GET /cart removes items whose product was deleted and reports how many
+  removedItems?: number;
 }
 
 export interface WishlistResponse extends MessageResponse {

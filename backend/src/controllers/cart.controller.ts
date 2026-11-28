@@ -126,6 +126,33 @@ export const getCart = async (
 
     const cart = await getOrCreateCart(userId);
 
+    // Remove items whose product was deleted. They can no longer be shown
+    // or removed individually, so the cart is cleaned up here and the
+    // number removed is reported to the client.
+    const cartProductIds = cart.items.map((item) => item.product);
+
+    const existingProducts =
+      cartProductIds.length > 0
+        ? await Product.find({ _id: { $in: cartProductIds } })
+            .select("_id")
+            .lean()
+        : [];
+
+    const existingIds = new Set(
+      existingProducts.map((product) => String(product._id))
+    );
+
+    const keptItems = cart.items.filter((item) =>
+      existingIds.has(String(item.product))
+    );
+
+    const removedItems = cart.items.length - keptItems.length;
+
+    if (removedItems > 0) {
+      cart.items.splice(0, cart.items.length, ...keptItems);
+      await cart.save();
+    }
+
     await populateCart(cart);
 
     // Ignore deleted or inactive products in cart summary
@@ -165,6 +192,7 @@ export const getCart = async (
     res.status(200).json({
       success: true,
       cart,
+      removedItems,
       summary: {
         totalItems,
         subtotal,
