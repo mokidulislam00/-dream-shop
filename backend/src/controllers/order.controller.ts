@@ -821,14 +821,26 @@ export const getAllOrders = async (
     }
 
     const filter: {
-      orderStatus?: OrderStatus;
+      orderStatus?: OrderStatus | { $in: OrderStatus[] };
     } = {};
 
-    // Filter by order status
+    // Filter by order status. One status, or several separated by commas
+    // (for example "pending,confirmed,processing,shipped").
     const status = req.query.status;
 
     if (status !== undefined) {
-      if (!isValidOrderStatus(status)) {
+      const requested =
+        typeof status === "string"
+          ? status
+              .split(",")
+              .map((value) => value.trim())
+              .filter(Boolean)
+          : [];
+
+      if (
+        requested.length === 0 ||
+        !requested.every((value) => isValidOrderStatus(value))
+      ) {
         res.status(400).json({
           success: false,
           message: "Invalid order status",
@@ -836,7 +848,10 @@ export const getAllOrders = async (
         return;
       }
 
-      filter.orderStatus = status;
+      const statuses = requested as OrderStatus[];
+
+      filter.orderStatus =
+        statuses.length === 1 ? statuses[0] : { $in: statuses };
     }
 
     const [orders, totalOrders] = await Promise.all([
@@ -859,6 +874,48 @@ export const getAllOrders = async (
         pageSize: limit,
       },
       orders,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// ==========================================
+// ADMIN: GET ANY ORDER BY ID
+// ==========================================
+
+export const getAdminOrderById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const id = req.params.id;
+
+    if (!isValidObjectId(id)) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
+      });
+      return;
+    }
+
+    const order = await Order.findById(id).populate(
+      "user",
+      "fullName email"
+    );
+
+    if (!order) {
+      res.status(404).json({
+        success: false,
+        message: "Order not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      success: true,
+      order,
     });
   } catch (error) {
     next(error);

@@ -7,6 +7,7 @@ import {
   getOrderById,
   cancelOrder,
   getAllOrders,
+  getAdminOrderById,
   updateOrderStatus,
   confirmCODPayment,
 } from "../controllers/order.controller";
@@ -61,6 +62,13 @@ router.get(
   "/admin/all",
   requireAdmin,
   getAllOrders
+);
+
+// Get any single order (admin)
+router.get(
+  "/admin/:id",
+  requireAdmin,
+  getAdminOrderById
 );
 
 // Update order status

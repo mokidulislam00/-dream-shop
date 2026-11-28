@@ -74,12 +74,7 @@ function ProductDetail({ product }: { product: Product }) {
         <ImageGallery images={product.images} alt={product.name} />
 
         <div>
-          {product.brand ? (
-            <p className="text-sm text-muted">
-              Brand: <span className="font-medium text-ink">{product.brand}</span>
-            </p>
-          ) : null}
-          <h1 className="mt-1 text-3xl sm:text-4xl">{product.name}</h1>
+          <h1 className="text-3xl sm:text-4xl">{product.name}</h1>
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <Price product={product} size="lg" />
@@ -88,7 +83,6 @@ function ProductDetail({ product }: { product: Product }) {
 
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <StockStatus stock={product.stock} unavailable={product.status !== "active"} />
-            <span className="text-sm text-muted">SKU {product.sku}</span>
           </div>
 
           <p className="mt-6 max-w-prose whitespace-pre-line text-ink/90">
@@ -129,6 +123,43 @@ function ProductDetail({ product }: { product: Product }) {
               No delivery charge
             </li>
           </ul>
+
+          <section
+            aria-labelledby="details-heading"
+            className="mt-8 border-t border-line pt-6"
+          >
+            <h2
+              id="details-heading"
+              className="font-sans text-base font-semibold tracking-normal"
+            >
+              Product details
+            </h2>
+            <dl className="mt-3 divide-y divide-line text-sm">
+              {product.brand ? (
+                <div className="flex justify-between gap-4 py-2.5">
+                  <dt className="text-muted">Brand</dt>
+                  <dd className="text-right font-medium">{product.brand}</dd>
+                </div>
+              ) : null}
+              {product.category ? (
+                <div className="flex justify-between gap-4 py-2.5">
+                  <dt className="text-muted">Category</dt>
+                  <dd className="text-right">
+                    <Link
+                      to={`/categories/${product.category._id}`}
+                      className="font-medium hover:text-accent"
+                    >
+                      {product.category.name}
+                    </Link>
+                  </dd>
+                </div>
+              ) : null}
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-muted">SKU</dt>
+                <dd className="text-right font-medium">{product.sku}</dd>
+              </div>
+            </dl>
+          </section>
         </div>
       </div>
 

@@ -90,14 +90,30 @@ const adminRoutes: RouteObject = {
         {
           element: <AdminLayout />,
           children: [
-            { index: true, element: stub("Dashboard", 6) },
+            {
+              index: true,
+              lazy: lazyPage(() => import("@/pages/admin/DashboardPage")),
+            },
             { path: "products", element: stub("Products", 6) },
             { path: "products/new", element: stub("New product", 6) },
             { path: "products/:id/edit", element: stub("Edit product", 6) },
             { path: "categories", element: stub("Categories", 6) },
-            { path: "orders", element: stub("Orders", 6) },
-            { path: "users", element: stub("Users", 6) },
-            { path: "users/:id", element: stub("User details", 6) },
+            {
+              path: "orders",
+              lazy: lazyPage(() => import("@/pages/admin/OrdersPage")),
+            },
+            {
+              path: "orders/:id",
+              lazy: lazyPage(() => import("@/pages/admin/OrderDetailPage")),
+            },
+            {
+              path: "users",
+              lazy: lazyPage(() => import("@/pages/admin/UsersPage")),
+            },
+            {
+              path: "users/:id",
+              lazy: lazyPage(() => import("@/pages/admin/UserDetailPage")),
+            },
           ],
         },
       ],

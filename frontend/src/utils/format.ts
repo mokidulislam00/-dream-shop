@@ -34,3 +34,12 @@ export const formatDateTime = (iso: string): string =>
 // order id are shown as a short reference.
 export const orderCode = (id: string): string =>
   `#${id.slice(-8).toUpperCase()}`;
+
+// Orders keep the customer as a populated object on the admin side
+// (or null if the account was deleted).
+export const getOrderCustomer = (order: {
+  user: unknown;
+}): { _id: string; fullName: string; email: string } | null =>
+  typeof order.user === "object" && order.user !== null
+    ? (order.user as { _id: string; fullName: string; email: string })
+    : null;

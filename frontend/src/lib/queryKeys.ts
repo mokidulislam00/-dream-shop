@@ -30,6 +30,7 @@ export const queryKeys = {
     categories: (params: object) => ["admin", "categories", params] as const,
     category: (id: string) => ["admin", "category", id] as const,
     orders: (params: object) => ["admin", "orders", params] as const,
+    order: (id: string) => ["admin", "order", id] as const,
     users: (params: object) => ["admin", "users", params] as const,
     user: (id: string) => ["admin", "user", id] as const,
   },

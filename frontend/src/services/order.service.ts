@@ -18,7 +18,8 @@ export interface OrderListParams {
 }
 
 export interface AdminOrderListParams extends OrderListParams {
-  status?: OrderStatus;
+  // One status or several (sent to the backend as a comma-separated list)
+  status?: OrderStatus | OrderStatus[];
 }
 
 export const orderService = {
@@ -51,10 +52,21 @@ export const orderService = {
   async adminList(
     params: AdminOrderListParams = {}
   ): Promise<OrderListResponse> {
+    const { status, ...rest } = params;
     const { data } = await api.get<OrderListResponse>("/orders/admin/all", {
-      params: cleanParams(params),
+      params: cleanParams({
+        ...rest,
+        status: Array.isArray(status) ? status.join(",") : status,
+      }),
     });
     return data;
+  },
+
+  async adminGetById(id: string): Promise<Order> {
+    const { data } = await api.get<OrderDetailResponse>(
+      `/orders/admin/${id}`
+    );
+    return data.order;
   },
 
   async adminUpdateStatus(
